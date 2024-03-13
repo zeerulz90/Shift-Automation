@@ -11,10 +11,8 @@ Follow these steps to set up the project environment:
 4. **Clone the Project**: Open the terminal or command prompt and navigate to the directory where you want to store the project files. Use the **`git clone`** command followed by the URL of the repository to create a local copy of the project.
 
    ```js
-   git clone <repository_url>
+   git clone https://github.com/zeerulz90/Shift-Automation.git
    ```
-
-   Replace **`<repository_url>`** with the URL of the project repository.
 
 5. **Install Dependencies**: Once the project is cloned, navigate to its root directory in the terminal and run the following command to install the required dependencies:
 
