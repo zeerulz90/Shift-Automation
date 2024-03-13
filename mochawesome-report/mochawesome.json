@@ -1,0 +1,195 @@
+{
+  "stats": {
+    "suites": 1,
+    "tests": 5,
+    "passes": 5,
+    "pending": 0,
+    "failures": 0,
+    "start": "2024-03-13T08:13:51.809Z",
+    "end": "2024-03-13T08:17:54.553Z",
+    "duration": 242744,
+    "testsRegistered": 5,
+    "passPercent": 100,
+    "pendingPercent": 0,
+    "other": 0,
+    "hasOther": false,
+    "skipped": 0,
+    "hasSkipped": false
+  },
+  "results": [
+    {
+      "uuid": "77569dae-3c37-4de8-b5f3-2488740e4e20",
+      "title": "",
+      "fullFile": "C:\\Users\\Ehsanul Khan\\Projects\\Shift\\Shift-Automation\\src\\shift.test.js",
+      "file": "\\src\\shift.test.js",
+      "beforeHooks": [],
+      "afterHooks": [],
+      "tests": [],
+      "suites": [
+        {
+          "uuid": "f19dd49c-3306-423d-b2cb-71d3c89051ef",
+          "title": "Download, install and test Shift functionalities",
+          "fullFile": "C:\\Users\\Ehsanul Khan\\Projects\\Shift\\Shift-Automation\\src\\shift.test.js",
+          "file": "\\src\\shift.test.js",
+          "beforeHooks": [],
+          "afterHooks": [
+            {
+              "title": "\"after all\" hook in \"Download, install and test Shift functionalities\"",
+              "fullTitle": "Download, install and test Shift functionalities \"after all\" hook in \"Download, install and test Shift functionalities\"",
+              "timedOut": false,
+              "duration": 5428,
+              "state": null,
+              "speed": null,
+              "pass": false,
+              "fail": false,
+              "pending": false,
+              "context": null,
+              "code": "if (driver) {\n    await driver.quit();\n}\nif (browser) {\n    await browser.close();\n}",
+              "err": {},
+              "uuid": "43475930-68fd-4ae6-8b49-c87d8ec3e450",
+              "parentUUID": "f19dd49c-3306-423d-b2cb-71d3c89051ef",
+              "isHook": true,
+              "skipped": false
+            }
+          ],
+          "tests": [
+            {
+              "title": "Verify Shift downloads properly and grab version from installer filename",
+              "fullTitle": "Download, install and test Shift functionalities Verify Shift downloads properly and grab version from installer filename",
+              "timedOut": false,
+              "duration": 10022,
+              "state": "passed",
+              "speed": "slow",
+              "pass": true,
+              "fail": false,
+              "pending": false,
+              "context": null,
+              "code": "// Set up browser context to launch Shift website in Chrome\nbrowser = await chromium.launch({\n    headless: false,\n    defaultBrowserOptions: {\n        timeout: constants.DEFAULT_TIMEOUT, // Set timeout to 30 seconds\n    },\n});\nconst context = await browser.newContext({ acceptDownloads: true });\npage = await context.newPage();\n// Need expect for assertions\nconst { expect } = await import('chai');\n// Open Shift website\nawait page.goto(constants.SHIFT_URL);\n// Download Shift\nconst [ download ] = await Promise.all([\n    page.waitForEvent('download'), // wait for download to start\n    page.getByRole('link', { name: constants.DOWNLOAD_SHIFT_BUTTON_LABEL }).first().click(),\n]);\n// Save shift installer executable file in the 'Downloads' folder of our project path \ninstallerPath = PROJECT_ROOT_DIR + constants.DOWNLOADS_PATH + download.suggestedFilename();\nawait download.saveAs(installerPath);\n// Verify download is successful\nconst fileExists = fs.existsSync(installerPath);\nexpect(fileExists).to.be.true;\n// Grab the version number from the installer filename\nconst filename = download.suggestedFilename().split('/').pop();\ninstallerVersionNumber = filename.match(constants.VERSION_MATCH_REGEX)[0];\nexpect(installerVersionNumber).not.to.be.null;",
+              "err": {},
+              "uuid": "12937f40-d031-4740-8b3f-d83c041dfd3a",
+              "parentUUID": "f19dd49c-3306-423d-b2cb-71d3c89051ef",
+              "isHook": false,
+              "skipped": false
+            },
+            {
+              "title": "Install Shift and verify versions from installer and installed filenames match",
+              "fullTitle": "Download, install and test Shift functionalities Install Shift and verify versions from installer and installed filenames match",
+              "timedOut": false,
+              "duration": 5231,
+              "state": "passed",
+              "speed": "slow",
+              "pass": true,
+              "fail": false,
+              "pending": false,
+              "context": null,
+              "code": "// Need expect for assertions\nconst { expect } = await import('chai');\n// Install Shift application\nconst installedPath = PROJECT_ROOT_DIR + constants.SHIFT_PATH;\ninstallApplication(installerPath, installedPath);\n\n// Allow some time before we attempt to run terminal command to retrieve app version\nawait delay(5000);\n// Get version number from installed version\nshiftPath = installedPath + constants.SHIFT_FILENAME;\nconst installedVersionNumber = await getFileVersion(shiftPath);\n// Match version from installer version and installer file\nexpect(installerVersionNumber).to.equal(installedVersionNumber);",
+              "err": {},
+              "uuid": "034bee5f-7e2a-42ed-a00b-ad1d115398aa",
+              "parentUUID": "f19dd49c-3306-423d-b2cb-71d3c89051ef",
+              "isHook": false,
+              "skipped": false
+            },
+            {
+              "title": "Launch Shift, login with first user and verify unread message count",
+              "fullTitle": "Download, install and test Shift functionalities Launch Shift, login with first user and verify unread message count",
+              "timedOut": false,
+              "duration": 66779,
+              "state": "passed",
+              "speed": "slow",
+              "pass": true,
+              "fail": false,
+              "pending": false,
+              "context": null,
+              "code": "// Need expect for assertions\nconst { expect } = await import('chai');\n// Allow some time before we attempt to launch Shift application, otherwise this can fail\nawait delay(20000);\n// Launch Shift application\ndriver = await launchShiftApp();\n// Ensure sign in section is visible\nconst signInButton = await driver.wait(until.elementLocated(By.xpath(signInLocators.locators.SIGN_IN_XPATH)), 20000);\n// Check terms of use only if unchecked\nconst termsOfUseCheckbox = await driver.findElement(By.xpath(signInLocators.locators.TERMS_OF_USE_CHECKBOX_XPATH));\nconst isTermsOfUseCheckboxChecked = await termsOfUseCheckbox.getAttribute('Toggle.ToggleState') === '1';\nif (!isTermsOfUseCheckboxChecked) {\n    await termsOfUseCheckbox.click();\n}\n// Uncheck streamline setup only if checked\nconst streamlineSetupCheckbox = await driver.findElement(By.xpath(signInLocators.locators.STREAMLINE_SETUP_CHECKBOX_XPATH));\nconst isStreamlineSetupCheckboxChecked = await streamlineSetupCheckbox.getAttribute('Toggle.ToggleState') === '1';\nif (isStreamlineSetupCheckboxChecked) {\n    await streamlineSetupCheckbox.click();\n}\n// Proceed with 'Sign in with google'\nawait signInButton.click();\n// Ensure locale is set to English before proceeding with entering email\nconst localeComboBox = await driver.wait(until.elementLocated(By.xpath(signInLocators.locators.LOCALE_COMBO_BOX_XPATH)), 10000);\nawait localeComboBox.click();\nconst englishOption = await driver.wait(until.elementLocated(By.xpath(signInLocators.locators.ENGLISH_US_LOCALE_OPTION_XPATH)), 5000);\nawait englishOption.click();\n// Ensure email input field is visible\nconst emailInputField = await driver.wait(until.elementLocated(By.xpath(signInLocators.locators.EMAIL_INPUT_XPATH)), 10000);\n// Type in the email and press ENTER key\nawait emailInputField.sendKeys(userProfile.firstUser.email);\nawait emailInputField.sendKeys(Key.ENTER);\n// Ensure password input field is visible\nconst passwordInputField = await driver.wait(until.elementLocated(By.xpath(signInLocators.locators.PASSWORD_INPUT_XPATH)), 10000);\n// Type in the password and press ENTER key\nawait passwordInputField.sendKeys(userProfile.firstUser.password);\nawait passwordInputField.sendKeys(Key.ENTER);\n// Click 'Continue' to allow Google to share name, email address etc with Shift\nconst continueButton = await driver.wait(until.elementLocated(By.xpath(signInLocators.locators.CONTINUE_BUTTON_XPATH)), 10000);\nawait continueButton.click();\n// Click 'Allow' to trust Shift with regards to viewing email messages etc\nconst allowButton = await driver.wait(until.elementLocated(By.xpath(signInLocators.locators.ALLOW_BUTTON_XPATH)), 10000);\nawait allowButton.click();\n\n// To verify login, we verify that the user avatar button (top-right) is visible\nconst avatarButton = await driver.wait(until.elementLocated(By.xpath(messagesLocators.locators.FIRST_AVATAR_XPATH)), 10000);\nexpect(avatarButton).to.not.be.null;\n// Confirm that unreal email messages are atleast 3 (based on the number that appears besides the 'Inbox' label)\nconst inboxDocumentXpath = await driver.findElement(By.xpath(messagesLocators.locators.INBOX_DOCUMENT_XPATH));\nconst nameAttribute = await inboxDocumentXpath.getAttribute(messagesLocators.labels.NAME_ATTRIBUTE);\nconst unreadMessageCount = parseInt(nameAttribute.match(constants.UNREAD_COUNT_REGEX)[0]); // Extract digits as integer\nexpect(unreadMessageCount).to.be.greaterThanOrEqual(constants.UNREAD_COUNT_MIN);",
+              "err": {},
+              "uuid": "b66ec31e-175a-42e3-83fe-f12508d13819",
+              "parentUUID": "f19dd49c-3306-423d-b2cb-71d3c89051ef",
+              "isHook": false,
+              "skipped": false
+            },
+            {
+              "title": "Add workspace for second user and verify unread message count for second user",
+              "fullTitle": "Download, install and test Shift functionalities Add workspace for second user and verify unread message count for second user",
+              "timedOut": false,
+              "duration": 94795,
+              "state": "passed",
+              "speed": "slow",
+              "pass": true,
+              "fail": false,
+              "pending": false,
+              "context": null,
+              "code": "// Need expect for assertions\nconst { expect } = await import('chai');\n// Click on the '+' to add workspace for the second user\naddToShiftButton = await driver.findElement(By.xpath(messagesLocators.locators.ADD_TO_SHIFT_XPATH));\nawait addToShiftButton.click();\nconst addWorkspaceButton = await driver.findElement(By.xpath(messagesLocators.locators.ADD_WORKSPACE_XPATH));\nawait addWorkspaceButton.click();\n// Enter email for new workspace\nconst secondUserEmailInputField = await driver.wait(until.elementLocated(By.xpath(messagesLocators.locators.ADD_WORKSPACE_EMAIL_XPATH)), 5000);\nawait secondUserEmailInputField.sendKeys(userProfile.secondUser.email);\n// Create Workspace\nconst createWorkspaceButton = await driver.findElement(By.xpath(messagesLocators.locators.CREATE_WORKSPACE_XPATH));\nawait createWorkspaceButton.click();\n// Locate the modal\nconst modal = await driver.wait(until.elementLocated(By.xpath(signInLocators.locators.MODAL_XPATH)), 30000);\nexpect(modal).not.to.be.null;\n// Since second user's email is pre-filled, just click the input and press ENTER to continue\nconst secondEmailInputField = await modal.findElement(By.xpath(signInLocators.locators.EMAIL_INPUT_XPATH));\nawait secondEmailInputField.click();\nawait secondEmailInputField.sendKeys(Key.ENTER);\n// Type in the password for second user and press ENTER key\nconst secondPasswordInputField = await driver.wait(until.elementLocated(By.xpath(signInLocators.locators.PASSWORD_INPUT_XPATH)), 10000);\nawait secondPasswordInputField.sendKeys(userProfile.secondUser.password);\nawait secondPasswordInputField.sendKeys(Key.ENTER);\n// Click 'Continue' to allow Google to share second user's name, email address etc with Shift\nconst secondContinueButton = await driver.wait(until.elementLocated(By.xpath(signInLocators.locators.CONTINUE_BUTTON_XPATH)), 10000);\nawait secondContinueButton.click();\n// Click 'Allow' to trust Shift with regards to viewing second user's email messages etc\nconst secondAllowButton = await driver.wait(until.elementLocated(By.xpath(signInLocators.locators.ALLOW_BUTTON_XPATH)), 10000);\nawait secondAllowButton.click();\n// Dismiss the 'Welcome to your Workspace'\nconst firstUserAvatar = await driver.findElement(By.xpath(messagesLocators.locators.FIRST_LEFT_USER_XPATH));\nawait firstUserAvatar.click();\nconst secondUserAvatar = await driver.findElement(By.xpath(messagesLocators.locators.SECOND_LEFT_USER_XPATH));\nawait secondUserAvatar.click();\n// To verify that second user is logged in, we verify that the second user's avatar button (top-right) is visible\nconst secondAvatarButton = await driver.findElement(By.xpath(messagesLocators.locators.SECOND_AVATAR_XPATH));\nexpect(secondAvatarButton).not.to.be.null;\n// Confirm that unreal email messages are atleast 3 (based on the number that appears besides the 'Inbox' label)\nconst secondInboxDocumentXpath = await driver.findElement(By.xpath(messagesLocators.locators.INBOX_DOCUMENT_XPATH));\nconst secondNameAttribute = await secondInboxDocumentXpath.getAttribute(messagesLocators.labels.NAME_ATTRIBUTE);\nconst secondUnreadMessageCount = parseInt(secondNameAttribute.match(constants.UNREAD_COUNT_REGEX)[0]); // Extract digits as integer\nexpect(secondUnreadMessageCount).to.greaterThanOrEqual(constants.UNREAD_COUNT_MIN);",
+              "err": {},
+              "uuid": "5a86a87d-aa9a-434a-964c-655876a559ab",
+              "parentUUID": "f19dd49c-3306-423d-b2cb-71d3c89051ef",
+              "isHook": false,
+              "skipped": false
+            },
+            {
+              "title": "Add messenger application for second user and verify messenger log in",
+              "fullTitle": "Download, install and test Shift functionalities Add messenger application for second user and verify messenger log in",
+              "timedOut": false,
+              "duration": 60478,
+              "state": "passed",
+              "speed": "slow",
+              "pass": true,
+              "fail": false,
+              "pending": false,
+              "context": null,
+              "code": "// Need expect for assertions\nconst { expect } = await import('chai');\n\n// Add application\nawait addToShiftButton.click();\nconst addApplicationButton = await driver.findElement(By.xpath(messagesLocators.locators.ADD_APPLICATION_XPATH));\nawait addApplicationButton.click();\n// Click 'All'\nconst allOption = await driver.wait(until.elementLocated(By.xpath(appsDirectoryLocators.locators.ALL_APPS_OPTION_XPATH)), 20000);\nawait allOption.click();\n// Search for 'Messenger'\nconst search = await driver.findElement(By.xpath(appsDirectoryLocators.locators.APP_SEARCH_INPUT_XPATH));\nawait search.click();\nawait search.sendKeys(appsDirectoryLocators.labels.MESSENGER_LABEL);\n// Click messenger app\nconst messenger = await driver.wait(until.elementLocated(By.xpath(appsDirectoryLocators.locators.MESSENGER_APP_XPATH)), 20000);\nawait messenger.click();\n// Save changes\nconst saveButton = await driver.wait(until.elementLocated(By.xpath(appsDirectoryLocators.locators.SAVE_APPLICATION_XPATH)), 20000);\nawait saveButton.click();\n// Enter email\nconst applicationEmailInput = await driver.wait(until.elementLocated(By.xpath(messengerLocators.locators.APPLICATION_EMAIL_XPATH)), 10000);\nawait applicationEmailInput.click();\nawait applicationEmailInput.sendKeys(userProfile.secondUser.email);\n// Enter password\nconst applicationPasswordInput = await driver.wait(until.elementLocated(By.xpath(messengerLocators.locators.APPLICATION_PASSWORD_XPATH)), 10000);\nawait applicationPasswordInput.click();\nawait applicationPasswordInput.sendKeys(userProfile.secondUser.password);\n// Log in\nconst applicationLogInButton = await driver.findElement(By.xpath(messengerLocators.locators.LOG_IN_XPATH));\nawait applicationLogInButton.click();\n// Verify log in by chat table visibility, no messages and no chats selected text\nconst chatTable = await driver.wait(until.elementLocated(By.xpath(messengerLocators.locators.CHAT_TABLE_XPATH)), 30000);\nexpect(chatTable).not.to.be.null;\n// Verify no messages as this is an empty account\nconst noMessagesText = await driver.findElement(By.xpath(messengerLocators.locators.NO_MESSAGES_XPATH));\nexpect(noMessagesText).not.to.be.null;\n// Verify no chats selected as this is an empty account\nconst noChatsSelectedText = await driver.findElement(By.xpath(messengerLocators.locators.NO_CHATS_SELECTED_XPATH));\nexpect(noChatsSelectedText).not.to.be.null;",
+              "err": {},
+              "uuid": "600b2d49-4724-4f8d-96ca-38cb075e1fd3",
+              "parentUUID": "f19dd49c-3306-423d-b2cb-71d3c89051ef",
+              "isHook": false,
+              "skipped": false
+            }
+          ],
+          "suites": [],
+          "passes": [
+            "12937f40-d031-4740-8b3f-d83c041dfd3a",
+            "034bee5f-7e2a-42ed-a00b-ad1d115398aa",
+            "b66ec31e-175a-42e3-83fe-f12508d13819",
+            "5a86a87d-aa9a-434a-964c-655876a559ab",
+            "600b2d49-4724-4f8d-96ca-38cb075e1fd3"
+          ],
+          "failures": [],
+          "pending": [],
+          "skipped": [],
+          "duration": 237305,
+          "root": false,
+          "rootEmpty": false,
+          "_timeout": 500000
+        }
+      ],
+      "passes": [],
+      "failures": [],
+      "pending": [],
+      "skipped": [],
+      "duration": 0,
+      "root": true,
+      "rootEmpty": true,
+      "_timeout": 2000
+    }
+  ],
+  "meta": {
+    "mocha": {
+      "version": "10.3.0"
+    },
+    "mochawesome": {
+      "options": {
+        "quiet": false,
+        "reportFilename": "mochawesome",
+        "saveHtml": true,
+        "saveJson": true,
+        "consoleReporter": "spec",
+        "useInlineDiffs": false,
+        "code": true
+      },
+      "version": "7.1.3"
+    },
+    "marge": {
+      "options": null,
+      "version": "6.2.0"
+    }
+  }
+}
